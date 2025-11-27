@@ -1,6 +1,6 @@
-import { getAuth } from "firebase/auth";  
+import { getAuth } from "firebase/auth";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export const getAuthHeaders = async () => {
   const auth = getAuth();
