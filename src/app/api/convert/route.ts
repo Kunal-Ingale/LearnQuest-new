@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyFirebaseToken } from '@/middleware/firebaseAuth';
 import { handleConvert } from '@/api/controllers/convert/convertController';
+import connectDB from '@/lib/mongodb';
 
 export async function POST(request: NextRequest) {
     try {
+        await connectDB();
+
         const authResult = await verifyFirebaseToken(request as any, {} as any, () => { });
 
         if (!authResult) {

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyFirebaseToken } from '@/middleware/firebaseAuth';
 import { getUserCourses } from '@/api/controllers/course/courseController';
+import connectDB from '@/lib/mongodb';
 
 export async function GET(request: NextRequest) {
     try {
+        await connectDB();
+
         const authResult = await verifyFirebaseToken(request as any, {} as any, () => { });
 
         if (!authResult) {
