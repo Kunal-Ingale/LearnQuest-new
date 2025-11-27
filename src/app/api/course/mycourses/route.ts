@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyFirebaseToken } from '@/middleware/firebaseAuth';
 import { getUserCourses } from '@/api/controllers/course/courseController';
 import connectDB from '@/lib/mongodb';
+import admin from '@/utils/firebase';
 
 export async function GET(request: NextRequest) {
     try {
         await connectDB();
 
-        const authResult = await verifyFirebaseToken(request as any, {} as any, () => { });
-
-        if (!authResult) {
+        // Verify Firebase token
+        const authHeader = request.headers.get('authorization');
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        const token = authHeader.split('Bearer ')[1];
+        const decodedToken = await admin.auth().verifyIdToken(token);
+
+        // Create mock request with user info
+        const mockReq: any = {
+            user: decodedToken,
+            headers: Object.fromEntries(request.headers.entries()),
+        };
 
         let responseData: any;
         let statusCode = 200;
@@ -30,11 +39,14 @@ export async function GET(request: NextRequest) {
             }
         };
 
-        await getUserCourses(request as any, mockRes as any);
+        await getUserCourses(mockReq, mockRes as any);
 
         return NextResponse.json(responseData, { status: statusCode });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Get courses API error:', error);
+        if (error.code === 'auth/id-token-expired' || error.code === 'auth/argument-error') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
