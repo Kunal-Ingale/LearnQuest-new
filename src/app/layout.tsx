@@ -1,6 +1,7 @@
 import ClientLayout from "./client-layout";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/AuthContext";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function RootLayout({
   children,
@@ -37,6 +38,7 @@ export default function RootLayout({
         <AuthProvider>
           <ClientLayout>{children}</ClientLayout>
         </AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
