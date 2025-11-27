@@ -92,7 +92,7 @@ const Header = () => {
       {/* Left - Logo */}
       <div className="flex-1">
         <h1
-          className="text-2xl font-bold text-blue-600 cursor-pointer"
+          className="text-2xl font-bold text-blue-600 cursor-pointer w-fit"
           onClick={() => {
             router.push("/");
             closeMobileMenu(); // Close menu on logo click

@@ -14,7 +14,12 @@ const nextConfig: NextConfig = {
     esmExternals: true, // ensures proper module resolution
   },
   images: {
-    domains: ["lh3.googleusercontent.com"], // whitelist Google profile pics
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
   },
 };
 
