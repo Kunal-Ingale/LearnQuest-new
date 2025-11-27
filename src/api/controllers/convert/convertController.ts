@@ -60,27 +60,41 @@ export const handleConvert = async (req: Request, res: Response) => {
     const playlistTitle = playlistInfo.items?.[0]?.snippet?.title || "Untitled Playlist";
     console.log("Playlist title:", playlistTitle);
 
-    // Fetch videos from YouTube API
-    console.log("Fetching playlist items from YouTube API");
-    const playlistRes = await fetch(
-      `${YOUTUBE_API_BASE}/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}`
-    );
+    // Fetch ALL videos from YouTube API using pagination
+    console.log("🔄 [PAGINATION] Starting to fetch playlist items from YouTube API");
+    let allItems: any[] = [];
+    let nextPageToken: string | undefined = undefined;
+    let pageCount = 0;
 
-    if (!playlistRes.ok) {
-      const errorData = await playlistRes.json();
-      console.error("YouTube API playlist fetch error:", errorData);
-      return res
-        .status(playlistRes.status)
-        .json({ error: errorData.error?.message || "Failed to fetch playlist" });
-    }
+    do {
+      pageCount++;
+      const url = `${YOUTUBE_API_BASE}/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+      console.log(`🔄 [PAGINATION] Fetching page ${pageCount}...`);
+      const playlistRes = await fetch(url);
 
-    const { items } = await playlistRes.json();
-    console.log("Fetched playlist items count:", items?.length || 0);
+      if (!playlistRes.ok) {
+        const errorData = await playlistRes.json();
+        console.error("YouTube API playlist fetch error:", errorData);
+        return res
+          .status(playlistRes.status)
+          .json({ error: errorData.error?.message || "Failed to fetch playlist" });
+      }
 
-    if (!items || items.length === 0) {
+      const data: any = await playlistRes.json();
+      allItems = allItems.concat(data.items || []);
+      nextPageToken = data.nextPageToken;
+
+      console.log(`✅ [PAGINATION] Page ${pageCount}: Fetched ${data.items?.length || 0} items | Total so far: ${allItems.length} | Next page token: ${nextPageToken ? 'YES' : 'NO'}`);
+    } while (nextPageToken);
+
+    console.log(`🎉 [PAGINATION] COMPLETE! Total playlist items fetched: ${allItems.length} videos across ${pageCount} pages`);
+
+    if (!allItems || allItems.length === 0) {
       console.error("No videos found in playlist");
       return res.status(404).json({ error: "No videos found in playlist" });
     }
+
+    const items = allItems;
 
     // Get channel name from the first video
     const firstVideoId = items[0].snippet.resourceId.videoId;

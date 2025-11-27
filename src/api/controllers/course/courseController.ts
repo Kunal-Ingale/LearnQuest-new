@@ -10,27 +10,41 @@ export const getCourse = async (req: Request, res: Response) => {
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ error: "Course not found" });
 
-    const idsParam = course.videoIds.join(",");
-    const videoRes = await axios.get(
-      "https://www.googleapis.com/youtube/v3/videos",
-      {
-        params: {
-          part: "snippet,contentDetails",
-          id: idsParam,
-          key: process.env.YOUTUBE_API_KEY,
-        },
-      }
-    );
+    // Batch video IDs into chunks of 50 (YouTube API limit)
+    const batchSize = 50;
+    const videoIdBatches = [];
+    for (let i = 0; i < course.videoIds.length; i += batchSize) {
+      videoIdBatches.push(course.videoIds.slice(i, i + batchSize));
+    }
 
-    const items = videoRes.data.items;
+    console.log(`Fetching ${course.videoIds.length} videos in ${videoIdBatches.length} batches`);
+
+    // Fetch all batches
+    const allItems: any[] = [];
+    for (const batch of videoIdBatches) {
+      const idsParam = batch.join(",");
+      const videoRes = await axios.get(
+        "https://www.googleapis.com/youtube/v3/videos",
+        {
+          params: {
+            part: "snippet,contentDetails",
+            id: idsParam,
+            key: process.env.YOUTUBE_API_KEY,
+          },
+        }
+      );
+      allItems.push(...(videoRes.data.items || []));
+    }
+
+    console.log(`Successfully fetched ${allItems.length} video details`);
 
     // Get channel name from first video if not already saved
     let channelName = course.description;
-    if (!channelName && items.length > 0) {
-      channelName = items[0].snippet.channelTitle || "Unknown Channel";
+    if (!channelName && allItems.length > 0) {
+      channelName = allItems[0].snippet.channelTitle || "Unknown Channel";
     }
 
-    const videos = items.map((item: any, index: number) => ({
+    const videos = allItems.map((item: any, index: number) => ({
       videoId: item.id,
       title: item.snippet.title,
       description: item.snippet.description,
@@ -105,33 +119,44 @@ export const getUserCourses = async (req: Request, res: Response) => {
       courses.map(async (course) => {
         let thumbnail = null;
         let channelName = course.description;
-        let videos = [];
+        let videos: any[] = [];
 
         if (course.videoIds?.length > 0) {
           try {
-            const idsParam = course.videoIds.join(",");
-            console.log("Fetching YouTube videos for course:", course._id);
+            // Batch video IDs into chunks of 50 (YouTube API limit)
+            const batchSize = 50;
+            const videoIdBatches = [];
+            for (let i = 0; i < course.videoIds.length; i += batchSize) {
+              videoIdBatches.push(course.videoIds.slice(i, i + batchSize));
+            }
 
-            const videoRes = await axios.get(
-              "https://www.googleapis.com/youtube/v3/videos",
-              {
-                params: {
-                  part: "snippet",
-                  id: idsParam,
-                  key: process.env.YOUTUBE_API_KEY,
-                },
-              }
-            );
+            console.log(`Fetching YouTube videos for course: ${course._id} (${course.videoIds.length} videos in ${videoIdBatches.length} batches)`);
 
-            const items = videoRes.data.items || [];
-            videos = items.map((item: any, index: number) => ({
+            // Fetch all batches
+            const allItems: any[] = [];
+            for (const batch of videoIdBatches) {
+              const idsParam = batch.join(",");
+              const videoRes = await axios.get(
+                "https://www.googleapis.com/youtube/v3/videos",
+                {
+                  params: {
+                    part: "snippet",
+                    id: idsParam,
+                    key: process.env.YOUTUBE_API_KEY,
+                  },
+                }
+              );
+              allItems.push(...(videoRes.data.items || []));
+            }
+
+            videos = allItems.map((item: any, index: number) => ({
               videoId: item.id,
               title: item.snippet.title,
               position: index + 1,
             }));
 
-            if (items.length > 0) {
-              const firstVideo = items[0];
+            if (allItems.length > 0) {
+              const firstVideo = allItems[0];
               thumbnail = firstVideo.snippet.thumbnails?.high?.url || null;
               if (firstVideo.snippet.channelTitle) {
                 channelName = firstVideo.snippet.channelTitle;

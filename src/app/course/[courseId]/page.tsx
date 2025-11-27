@@ -294,9 +294,9 @@ const CoursePage: React.FC = () => {
       updateProgressHistory(currentVideo);
     }
 
-    // Autoplay next
+    // Autoplay next (instant transition)
     if (autoplay) {
-      setTimeout(() => handleNextVideo(), 1500);
+      handleNextVideo();
     }
   };
 
