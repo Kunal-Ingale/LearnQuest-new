@@ -77,43 +77,73 @@ const Login: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col md:flex-row min-h-screen text-foreground">
+      <div className="flex flex-col md:flex-row min-h-screen text-foreground relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 animate-gradient-xy"></div>
+
+        {/* Floating Learning Emojis */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 text-6xl animate-float">📚</div>
+          <div className="absolute top-20 right-20 text-5xl animate-float-delayed">🎓</div>
+          <div className="absolute bottom-32 left-20 text-7xl animate-float-slow">💡</div>
+          <div className="absolute top-1/3 right-10 text-6xl animate-float">🚀</div>
+          <div className="absolute bottom-20 right-32 text-5xl animate-float-delayed">✨</div>
+          <div className="absolute top-1/2 left-1/4 text-4xl animate-float-slow">🎯</div>
+          <div className="absolute bottom-1/3 right-1/4 text-5xl animate-float">🌟</div>
+          <div className="absolute top-2/3 left-1/3 text-6xl animate-float-delayed">📖</div>
+        </div>
+
         {/* Left Panel */}
-        <div className="w-full md:w-1/2 bg-gradient-to-br from-blue-600 to-purple-400 text-white p-10 flex flex-col justify-center min-h-[60vh] md:min-h-screen">
-          <div>
-            <Link href="/" className="text-4xl font-bold mb-6 inline-block">
-              LearnQuest
+        <div className="w-full md:w-1/2 relative z-10 text-white p-10 flex flex-col justify-center min-h-[60vh] md:min-h-screen">
+          <div className="backdrop-blur-sm bg-white/10 rounded-3xl p-8 border border-white/20 shadow-2xl">
+            <Link href="/" className="text-5xl font-bold mb-6 inline-block hover:scale-105 transition-transform">
+              LearnQuest 🎓
             </Link>
-            <h1 className="text-4xl font-bold leading-tight mb-4">
+            <h1 className="text-5xl font-bold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">
               Transform Your Learning Experience
             </h1>
-            <p className="text-lg text-white/90 mb-6">
+            <p className="text-xl text-white/95 mb-8 leading-relaxed">
               Convert YouTube videos into structured, interactive courses. Learn
-              at your own pace.
+              at your own pace with AI-powered insights. 🚀
             </p>
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-                <ArrowRight className="h-6 w-6 text-white" />
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-2xl shadow-lg">
+                  📚
+                </div>
+                <p className="text-lg font-medium">Organize your learning path</p>
               </div>
-              <p className="text-lg">Join our learning community today!</p>
+              <div className="flex items-center gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-2xl shadow-lg">
+                  ✅
+                </div>
+                <p className="text-lg font-medium">Track your progress effortlessly</p>
+              </div>
+              <div className="flex items-center gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-2xl shadow-lg">
+                  🎯
+                </div>
+                <p className="text-lg font-medium">Achieve your learning goals</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Right Panel */}
-        <div className="w-full md:w-1/2 p-6 md:p-16 flex items-center justify-center bg-white">
-          <div className="w-full max-w-md space-y-8 bg-white rounded-2xl shadow-xl p-8 md:p-10">
+        <div className="w-full md:w-1/2 relative z-10 p-6 md:p-16 flex items-center justify-center">
+          <div className="w-full max-w-md space-y-8 backdrop-blur-xl bg-white/95 rounded-3xl shadow-2xl p-8 md:p-10 border border-white/20">
             <div className="text-center">
               <Link href="/" className="md:hidden inline-block mb-6">
-                <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-accent-500">
-                  LearningTube
+                <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                  LearnQuest 🎓
                 </h1>
               </Link>
-              <h2 className="text-3xl font-semibold text-gray-900">
-                Welcome Back
+              <div className="mb-4 text-6xl">👋</div>
+              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                Welcome Back!
               </h2>
-              <p className="text-sm text-muted-foreground mt-2">
-                Login or create an account to continue
+              <p className="text-sm text-gray-600 mt-2">
+                Login or create an account to continue your learning journey
               </p>
             </div>
 
